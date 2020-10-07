@@ -5,6 +5,19 @@ class Mailer < ActionMailer::Base
     default from: 'expertiza-support@lists.ncsu.edu'
   end
 
+  def general_email(defn)
+    @link = defn[:link]
+    @assignment = defn[:assignment]
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+      defn[:cc] = nil
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         cc: defn[:cc],
+         body: defn[:body])
+  end
+
   def generic_message(defn)
     @partial_name = defn[:body][:partial_name]
     @user = defn[:body][:user]
@@ -82,4 +95,26 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to])
   end
+
+  #E2069 UPDATE
+  def send_email(user_id, team_id, propose, suggestion)
+    proposer = User.find_by(id: user_id)
+    if propose
+      teams_users = TeamsUser.where(team_id: team_id)
+      cc_mail_list = []
+      teams_users.each do |teams_user|
+        cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
+      end
+      suggested_topic_approved_message(
+        to: proposer.email,
+        cc: cc_mail_list,
+        subject: "Suggested topic '#{@suggestion.title}' has been approved",
+        body: {
+          approved_topic_name: @suggestion.title,
+          proposer: proposer.name
+        }
+      ).deliver_now!
+    end
+  end
+
 end
