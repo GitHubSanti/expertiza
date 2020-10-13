@@ -172,7 +172,7 @@ class SuggestionController < ApplicationController
       @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
       @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     end
-    new_topic_from_suggestion(@suggestion)
+    SignUpTopic.new_topic_from_suggestion(@suggestion)
     notification
     redirect_to action: 'show', id: @suggestion
   end
