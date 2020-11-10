@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201031212244) do
+ActiveRecord::Schema.define(version: 20201108040411) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -393,7 +393,7 @@ ActiveRecord::Schema.define(version: 20201031212244) do
     t.integer  "parent_id",           limit: 4
     t.datetime "submitted_at"
     t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated", limit: 4,     default: 0,    null: false
+    t.integer  "penalty_accumulated", limit: 4,     default: 0,     null: false
     t.float    "grade",               limit: 24
     t.string   "type",                limit: 255
     t.string   "handle",              limit: 255
@@ -403,6 +403,7 @@ ActiveRecord::Schema.define(version: 20201031212244) do
     t.boolean  "can_take_quiz",                     default: true
     t.float    "Hamer",               limit: 24,    default: 1.0
     t.float    "Lauw",                limit: 24,    default: 0.0
+    t.boolean  "can_mentor",                        default: false
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -816,8 +817,8 @@ ActiveRecord::Schema.define(version: 20201031212244) do
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
+  add_foreign_key "assignment_team_mentors", "participants", column: "assignment_team_mentor_id"
   add_foreign_key "assignment_team_mentors", "teams", column: "assignment_team_id"
-  add_foreign_key "assignment_team_mentors", "users", column: "assignment_team_mentor_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
