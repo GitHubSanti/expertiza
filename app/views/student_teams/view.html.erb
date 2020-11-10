@@ -63,24 +63,23 @@
       <td>
     </tr>
   </table>
+
+
+    <b>Mentor</b>
+    <br/><br/>
+    <!--start mentor table-->
+    <table style="width:80%" align="center" >
+      <tr style="border: 1px outset #000000; padding: 10px 20px" >
+        <th class="head">Username</th>
+        <th class="head">Full name</th>
+        <th class="head">Email address</th>
+      </tr>
+
+
+
+
 <% end %>
 
-<b>Mentor</b>
-  <br/><br/>
-  <!--start mentor table-->
-  <table style="width:80%" align="center" >
-    <tr style="border: 1px outset #000000; padding: 10px 20px" >
-      <th class="head">Username</th>
-      <th class="head">Full name</th>
-      <th class="head">Email address</th>
-    </tr>
-    <% for mentor in @student.assignment_team_mentors %> <!--start mentor content-->
-      <tr>
-        <td><%= mentor.user.name(session[:ip]) %></td>
-        <td><%= mentor.user.fullname(session[:ip]) %></td>
-        <td><%= mentor.user.email(session[:ip]) %></td>  
-      </tr>
-    <% end %>   <!--end mentor content-->
 
 <!--render partial for join team request-->
   <% if @student.team!=nil %>
