@@ -75,8 +75,13 @@
         <th class="head">Email address</th>
       </tr>
 
-
-
+      <% for mentor in @student.team.mentors %> <!--start mentor content-->
+          <tr>
+            <td><%= mentor.user.name(session[:ip]) %></td>
+            <td><%= mentor.user.fullname(session[:ip]) %></td>
+            <td><%= mentor.user.email(session[:ip]) %></td>
+          </tr>
+      <% end %>
 
 <% end %>
 

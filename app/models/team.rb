@@ -17,6 +17,12 @@ class Team < ActiveRecord::Base
   end
   alias get_participants participants
 
+  #E2077. Gets mentor of a team
+  def mentors
+    mentor_id = Participant.find(id: Participant.find(29188).team.assignment_team_mentors.assignment_team_mentor_id)
+    mentor_id.particpants
+  end
+
   # Get the response review map
   def responses
     participants.flat_map(&:responses)
