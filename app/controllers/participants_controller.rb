@@ -20,7 +20,7 @@ class ParticipantsController < ApplicationController
       @model = params[:model]
       # E726 Fall2012 Changes Begin
       @authorization = params[:authorization]
-      # E726 Fall2012 Changes End
+        # E726 Fall2012 Changes End
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -40,6 +40,7 @@ class ParticipantsController < ApplicationController
       end
       user = User.find_by(name: params[:user][:name])
       @participant = curr_object.participants.find_by(user_id: user.id)
+      @participant.get_can_mentor
       flash.now[:note] = "The user <b>#{params[:user][:name]}</b> has successfully been added."
     rescue StandardError
       url_for controller: 'users', action: 'new'
@@ -56,6 +57,7 @@ class ParticipantsController < ApplicationController
     can_review = permissions[:can_review]
     can_take_quiz = permissions[:can_take_quiz]
     participant = Participant.find(params[:id])
+    participant.get_can_mentor
     parent_id = participant.parent_id
     # Upon successfully updating the attributes based on user role, a flash message is displayed to the user after the
     # change in the database. This also gives the user the error message if the update fails.
@@ -96,7 +98,9 @@ class ParticipantsController < ApplicationController
       participants = course.participants
       if !participants.empty?
         participants.each do |participant|
+          participant.get_can_mentor
           new_participant = participant.copy(params[:id])
+          new_participant.get_can_mentor
           @copied_participants.push new_participant if new_participant
         end
         # Only display undo link if copies of participants are created
@@ -161,11 +165,11 @@ class ParticipantsController < ApplicationController
     name = contributor.name
     assignment_id = contributor.assignment
     begin
-        contributor.destroy
-        flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
-      rescue StandardError
-        flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
-      end
+      contributor.destroy
+      flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
+    rescue StandardError
+      flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
+    end
     redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
   end
 

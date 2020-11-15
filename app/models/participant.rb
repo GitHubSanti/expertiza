@@ -76,15 +76,15 @@ class Participant < ActiveRecord::Base
     assignment = Assignment.find_by(id: self.assignment.id)
 
     Mailer.sync_message(
-      recipients: user.email,
-      subject: "You have been registered as a participant in the Assignment #{assignment.name}",
-      body: {
-        home_page: home_page,
-        first_name: ApplicationHelper.get_user_first_name(user),
-        name: user.name,
-        password: pw,
-        partial_name: "register"
-      }
+        recipients: user.email,
+        subject: "You have been registered as a participant in the Assignment #{assignment.name}",
+        body: {
+            home_page: home_page,
+            first_name: ApplicationHelper.get_user_first_name(user),
+            name: user.name,
+            password: pw,
+            partial_name: "register"
+        }
     ).deliver
   end
 
@@ -100,17 +100,40 @@ class Participant < ActiveRecord::Base
     can_review = true
     can_take_quiz = true
     case authorization
-    when 'reader'
-      can_submit = false
-    when 'reviewer'
-      can_submit = false
-      can_take_quiz = false
-    when 'submitter'
-      can_review = false
-      can_take_quiz = false
+      when 'reader'
+        can_submit = false
+      when 'reviewer'
+        can_submit = false
+        can_take_quiz = false
+      when 'submitter'
+        can_review = false
+        can_take_quiz = false
     end
     {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
   end
+
+  # Edit this to enable manual setting of mentors
+  def get_can_mentor
+    can_mentor = false
+    user_role = User.find(self.user_id).role.name
+    case user_role
+      when 'Student'
+        can_mentor = false
+      when 'Instructor'
+        can_mentor = true
+      when 'Teaching Assistant'
+        can_mentor = true
+    end
+    Participant.where(user_id: self.user_id).each do |participant|
+      participant.update_column(:can_mentor, can_mentor)
+    end
+  end
+
+  # Get mentors for specified assignment
+  def self.get_mentors(assignment_id)
+    Participant.where(can_mentor: true).where(parent_id: assignment_id)
+  end
+
 
   # Get authorization from permissions.
   def self.get_authorization(can_submit, can_review, can_take_quiz)
@@ -120,6 +143,8 @@ class Participant < ActiveRecord::Base
     authorization = 'reviewer' if can_submit == false and can_review == true and can_take_quiz == false
     authorization
   end
+
+
 
   # Sort a set of participants based on their user names.
   # Please make sure there is no duplicated participant in this input array.
@@ -155,8 +180,4 @@ class Participant < ActiveRecord::Base
     fields
   end
 
-  # Generate list of possible mentors that have been added as participants to a specified assignment. Looking for specifically for participants added that are either 
-  def self.getPotentialMentors(assignment_id)
-    where(parent_id: assignment_id).select{|p| User.find(p.user_id).role.ta? || User.find(p.user_id).role.instructor?} 
-  end
 end
